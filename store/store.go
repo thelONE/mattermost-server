@@ -298,8 +298,8 @@ type ThreadStore interface {
 	// Delete(postID string) error
 	GetPosts(threadID string, since int64) ([]*model.Post, error)
 
-	MarkAllAsRead(userID, teamID string) error
-	MarkAllAsReadInChannels(userID string, channelIDs []string) error
+	MarkAllAsRead(userID string, threadIds []string) error
+	MarkAllAsReadByTeam(userID, teamID string) error
 	MarkAsRead(userID, threadID string, timestamp int64) error
 
 	SaveMembership(membership *model.ThreadMembership) (*model.ThreadMembership, error)
@@ -309,7 +309,6 @@ type ThreadStore interface {
 	DeleteMembershipForUser(userId, postID string) error
 	MaintainMembership(userID, postID string, opts ThreadMembershipOpts) (*model.ThreadMembership, error)
 	CollectThreadsWithNewerReplies(userId string, channelIds []string, timestamp int64) ([]string, error)
-	UpdateLastViewedByThreadIds(userId string, threadIds []string, timestamp int64) error
 	PermanentDeleteBatchForRetentionPolicies(now, globalPolicyEndTime, limit int64, cursor model.RetentionPolicyCursor) (int64, model.RetentionPolicyCursor, error)
 	PermanentDeleteBatchThreadMembershipsForRetentionPolicies(now, globalPolicyEndTime, limit int64, cursor model.RetentionPolicyCursor) (int64, model.RetentionPolicyCursor, error)
 	DeleteOrphanedRows(limit int) (deleted int64, err error)

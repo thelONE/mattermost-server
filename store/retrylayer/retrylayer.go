@@ -10582,11 +10582,11 @@ func (s *RetryLayerThreadStore) MaintainMembership(userID string, postID string,
 
 }
 
-func (s *RetryLayerThreadStore) MarkAllAsRead(userID string, teamID string) error {
+func (s *RetryLayerThreadStore) MarkAllAsRead(userID string, threadIds []string) error {
 
 	tries := 0
 	for {
-		err := s.ThreadStore.MarkAllAsRead(userID, teamID)
+		err := s.ThreadStore.MarkAllAsRead(userID, threadIds)
 		if err == nil {
 			return nil
 		}
@@ -10603,11 +10603,11 @@ func (s *RetryLayerThreadStore) MarkAllAsRead(userID string, teamID string) erro
 
 }
 
-func (s *RetryLayerThreadStore) MarkAllAsReadInChannels(userID string, channelIDs []string) error {
+func (s *RetryLayerThreadStore) MarkAllAsReadByTeam(userID string, teamID string) error {
 
 	tries := 0
 	for {
-		err := s.ThreadStore.MarkAllAsReadInChannels(userID, channelIDs)
+		err := s.ThreadStore.MarkAllAsReadByTeam(userID, teamID)
 		if err == nil {
 			return nil
 		}
@@ -10702,27 +10702,6 @@ func (s *RetryLayerThreadStore) SaveMembership(membership *model.ThreadMembershi
 		if tries >= 3 {
 			err = errors.Wrap(err, "giving up after 3 consecutive repeatable transaction failures")
 			return result, err
-		}
-		timepkg.Sleep(100 * timepkg.Millisecond)
-	}
-
-}
-
-func (s *RetryLayerThreadStore) UpdateLastViewedByThreadIds(userId string, threadIds []string, timestamp int64) error {
-
-	tries := 0
-	for {
-		err := s.ThreadStore.UpdateLastViewedByThreadIds(userId, threadIds, timestamp)
-		if err == nil {
-			return nil
-		}
-		if !isRepeatableError(err) {
-			return err
-		}
-		tries++
-		if tries >= 3 {
-			err = errors.Wrap(err, "giving up after 3 consecutive repeatable transaction failures")
-			return err
 		}
 		timepkg.Sleep(100 * timepkg.Millisecond)
 	}

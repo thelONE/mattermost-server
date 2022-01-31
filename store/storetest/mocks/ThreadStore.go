@@ -257,13 +257,13 @@ func (_m *ThreadStore) MaintainMembership(userID string, postID string, opts sto
 	return r0, r1
 }
 
-// MarkAllAsRead provides a mock function with given fields: userID, teamID
-func (_m *ThreadStore) MarkAllAsRead(userID string, teamID string) error {
-	ret := _m.Called(userID, teamID)
+// MarkAllAsRead provides a mock function with given fields: userID, threadIds
+func (_m *ThreadStore) MarkAllAsRead(userID string, threadIds []string) error {
+	ret := _m.Called(userID, threadIds)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(userID, teamID)
+	if rf, ok := ret.Get(0).(func(string, []string) error); ok {
+		r0 = rf(userID, threadIds)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -271,13 +271,13 @@ func (_m *ThreadStore) MarkAllAsRead(userID string, teamID string) error {
 	return r0
 }
 
-// MarkAllAsReadInChannels provides a mock function with given fields: userID, channelIDs
-func (_m *ThreadStore) MarkAllAsReadInChannels(userID string, channelIDs []string) error {
-	ret := _m.Called(userID, channelIDs)
+// MarkAllAsReadByTeam provides a mock function with given fields: userID, teamID
+func (_m *ThreadStore) MarkAllAsReadByTeam(userID string, teamID string) error {
+	ret := _m.Called(userID, teamID)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, []string) error); ok {
-		r0 = rf(userID, channelIDs)
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(userID, teamID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -376,20 +376,6 @@ func (_m *ThreadStore) SaveMembership(membership *model.ThreadMembership) (*mode
 	}
 
 	return r0, r1
-}
-
-// UpdateLastViewedByThreadIds provides a mock function with given fields: userId, threadIds, timestamp
-func (_m *ThreadStore) UpdateLastViewedByThreadIds(userId string, threadIds []string, timestamp int64) error {
-	ret := _m.Called(userId, threadIds, timestamp)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, []string, int64) error); ok {
-		r0 = rf(userId, threadIds, timestamp)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
 }
 
 // UpdateMembership provides a mock function with given fields: membership

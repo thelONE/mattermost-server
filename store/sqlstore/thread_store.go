@@ -424,44 +424,27 @@ func (s *SqlThreadStore) GetThreadForUser(teamId string, threadMembership *model
 	return result, nil
 }
 
-// MarkAllAsReadInChannels marks all threads for the given user in the given channels as read from
-// the current time.
-func (s *SqlThreadStore) MarkAllAsReadInChannels(userID string, channelIDs []string) error {
-	var threadIDs []string
+// MarkAllAsRead sets the last viewed timestamp to the current time, clears the unread mention
+// count, and sets the last updated timestamp for the given user's thread memberships.
+func (s *SqlThreadStore) MarkAllAsRead(userId string, threadIds []string) error {
+	timestamp := model.GetMillis()
 
 	query, args, _ := s.getQueryBuilder().
-		Select("ThreadMemberships.PostId").
-		Join("Threads ON Threads.PostId = ThreadMemberships.PostId").
-		Join("Channels ON Threads.ChannelId = Channels.Id").
-		From("ThreadMemberships").
-		Where(sq.Eq{"Threads.ChannelId": channelIDs}).
-		Where(sq.Eq{"ThreadMemberships.UserId": userID}).
-		ToSql()
-
-	_, err := s.GetReplica().Select(&threadIDs, query, args...)
-	if err != nil {
-		return errors.Wrapf(err, "failed to get thread membership with userid=%s", userID)
-	}
-
-	timestamp := model.GetMillis()
-	query, args, _ = s.getQueryBuilder().
 		Update("ThreadMemberships").
-		Where(sq.Eq{"PostId": threadIDs}).
-		Where(sq.Eq{"UserId": userID}).
+		Where(sq.Eq{"UserId": userId}).
+		Where(sq.Eq{"PostId": threadIds}).
 		Set("LastViewed", timestamp).
 		Set("UnreadMentions", 0).
 		Set("LastUpdated", model.GetMillis()).
 		ToSql()
 	if _, err := s.GetMaster().Exec(query, args...); err != nil {
-		return errors.Wrapf(err, "failed to update thread read state for user id=%s", userID)
+		return errors.Wrapf(err, "failed to mark %d threads as read for user id=%s", len(threadIds), userId)
 	}
-	return nil
 
+	return nil
 }
 
-// MarkAllAsRead marks all threads for the given user in the given team as read from the current
-// time.
-func (s *SqlThreadStore) MarkAllAsRead(userId, teamId string) error {
+func (s *SqlThreadStore) MarkAllAsReadByTeam(userId, teamId string) error {
 	memberships, err := s.GetMembershipsForUser(userId, teamId)
 	if err != nil {
 		return err
@@ -678,30 +661,8 @@ func (s *SqlThreadStore) CollectThreadsWithNewerReplies(userId string, channelId
 	if _, err := s.GetReplica().Select(&changedThreads, query, args...); err != nil {
 		return nil, errors.Wrap(err, "failed to fetch threads")
 	}
+
 	return changedThreads, nil
-}
-
-// UpdateLastViewedByThreadIds marks the given threads as read up to the given timestamp. If there
-// are no newer posts, it effectively marks the thread as read. If there are newer posts, say
-// because the user explicitly marked a past post as unread, the thread will be considered unread
-// past the given timestamp.
-func (s *SqlThreadStore) UpdateLastViewedByThreadIds(userId string, threadIds []string, timestamp int64) error {
-	if len(threadIds) == 0 {
-		return nil
-	}
-
-	qb := s.getQueryBuilder().
-		Update("ThreadMemberships").
-		Where(sq.Eq{"UserId": userId, "PostId": threadIds}).
-		Set("LastViewed", timestamp).
-		Set("LastUpdated", model.GetMillis())
-	updateQuery, updateArgs, _ := qb.ToSql()
-
-	if _, err := s.GetMaster().Exec(updateQuery, updateArgs...); err != nil {
-		return errors.Wrap(err, "failed to update thread membership")
-	}
-
-	return nil
 }
 
 func (s *SqlThreadStore) GetPosts(threadId string, since int64) ([]*model.Post, error) {

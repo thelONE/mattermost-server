@@ -8343,10 +8343,10 @@ func (s *TimerLayerThreadStore) MaintainMembership(userID string, postID string,
 	return result, err
 }
 
-func (s *TimerLayerThreadStore) MarkAllAsRead(userID string, teamID string) error {
+func (s *TimerLayerThreadStore) MarkAllAsRead(userID string, threadIds []string) error {
 	start := timemodule.Now()
 
-	err := s.ThreadStore.MarkAllAsRead(userID, teamID)
+	err := s.ThreadStore.MarkAllAsRead(userID, threadIds)
 
 	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
 	if s.Root.Metrics != nil {
@@ -8359,10 +8359,10 @@ func (s *TimerLayerThreadStore) MarkAllAsRead(userID string, teamID string) erro
 	return err
 }
 
-func (s *TimerLayerThreadStore) MarkAllAsReadInChannels(userID string, channelIDs []string) error {
+func (s *TimerLayerThreadStore) MarkAllAsReadByTeam(userID string, teamID string) error {
 	start := timemodule.Now()
 
-	err := s.ThreadStore.MarkAllAsReadInChannels(userID, channelIDs)
+	err := s.ThreadStore.MarkAllAsReadByTeam(userID, teamID)
 
 	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
 	if s.Root.Metrics != nil {
@@ -8370,7 +8370,7 @@ func (s *TimerLayerThreadStore) MarkAllAsReadInChannels(userID string, channelID
 		if err == nil {
 			success = "true"
 		}
-		s.Root.Metrics.ObserveStoreMethodDuration("ThreadStore.MarkAllAsReadInChannels", success, elapsed)
+		s.Root.Metrics.ObserveStoreMethodDuration("ThreadStore.MarkAllAsReadByTeam", success, elapsed)
 	}
 	return err
 }
@@ -8437,22 +8437,6 @@ func (s *TimerLayerThreadStore) SaveMembership(membership *model.ThreadMembershi
 		s.Root.Metrics.ObserveStoreMethodDuration("ThreadStore.SaveMembership", success, elapsed)
 	}
 	return result, err
-}
-
-func (s *TimerLayerThreadStore) UpdateLastViewedByThreadIds(userId string, threadIds []string, timestamp int64) error {
-	start := timemodule.Now()
-
-	err := s.ThreadStore.UpdateLastViewedByThreadIds(userId, threadIds, timestamp)
-
-	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
-	if s.Root.Metrics != nil {
-		success := "false"
-		if err == nil {
-			success = "true"
-		}
-		s.Root.Metrics.ObserveStoreMethodDuration("ThreadStore.UpdateLastViewedByThreadIds", success, elapsed)
-	}
-	return err
 }
 
 func (s *TimerLayerThreadStore) UpdateMembership(membership *model.ThreadMembership) (*model.ThreadMembership, error) {
