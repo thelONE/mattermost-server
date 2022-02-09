@@ -468,6 +468,35 @@ func (s *SqlThreadStore) MarkAllAsReadByTeam(userId, teamId string) error {
 	return nil
 }
 
+func (s *SqlThreadStore) MarkAllAsReadByChannels(userID string, channelIDs []string) error {
+	now := model.GetMillis()
+
+	subquery, subqueryArgs, _ := s.getQueryBuilder().
+		PlaceholderFormat(sq.Question).
+		Select("Threads.PostId").
+		From("Threads").
+		Join("ChannelMembers ON ChannelMembers.ChannelId = Threads.ChannelId").
+		Where(sq.Eq{"Threads.ChannelId": channelIDs}).
+		Where(sq.Eq{"ChannelMembers.UserId": userID}).
+		Where(sq.Expr("Threads.LastReplyAt > ChannelMembers.LastViewedAt")).
+		ToSql()
+
+	query, args, _ := s.getQueryBuilder().
+		Update("ThreadMemberships").
+		Where(sq.Eq{"UserId": userID}).
+		Where(sq.Expr("PostId IN ("+subquery+")", subqueryArgs...)).
+		Set("LastViewed", now).
+		Set("UnreadMentions", 0).
+		Set("LastUpdated", now).
+		ToSql()
+
+	if _, err := s.GetMaster().Exec(query, args...); err != nil {
+		return errors.Wrapf(err, "failed to mark all threads as read by channels for user id=%s", userID)
+	}
+
+	return nil
+}
+
 // MarkAsRead marks the given thread for the given user as unread from the given timestamp.
 func (s *SqlThreadStore) MarkAsRead(userId, threadId string, timestamp int64) error {
 	query, args, _ := s.getQueryBuilder().
