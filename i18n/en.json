@@ -9192,6 +9192,10 @@
     "translation": "System"
   },
   {
+    "id": "undefined",
+    "translation": "undefined"
+  },
+  {
     "id": "web.command_webhook.command.app_error",
     "translation": "Couldn't find the command."
   },
