@@ -2882,7 +2882,7 @@ func (a *App) MarkChannelsAsViewed(channelIDs []string, userID string, currentSe
 	updateThreads := *a.Config().ServiceSettings.ThreadAutoFollow && (!collapsedThreadsSupported || !a.IsCRTEnabledForUser(userID))
 	var threadsToUpdate []string
 	if updateThreads {
-		threadsToUpdate, err = a.Srv().Store.Thread().CollectThreadsWithNewerReplies(userID, channelIDs, model.GetMillis())
+		threadsToUpdate, err = a.Srv().Store.Thread().CollectThreadsWithNewerReplies(userID, channelIDs)
 		if err != nil {
 			return nil, model.NewAppError("MarkChannelsAsViewed", "undefined", nil, err.Error(), http.StatusInternalServerError)
 		}

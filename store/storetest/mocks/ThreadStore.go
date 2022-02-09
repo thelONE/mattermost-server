@@ -15,13 +15,13 @@ type ThreadStore struct {
 	mock.Mock
 }
 
-// CollectThreadsWithNewerReplies provides a mock function with given fields: userId, channelIds, timestamp
-func (_m *ThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds []string, timestamp int64) ([]string, error) {
-	ret := _m.Called(userId, channelIds, timestamp)
+// CollectThreadsWithNewerReplies provides a mock function with given fields: userId, channelIds
+func (_m *ThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds []string) ([]string, error) {
+	ret := _m.Called(userId, channelIds)
 
 	var r0 []string
-	if rf, ok := ret.Get(0).(func(string, []string, int64) []string); ok {
-		r0 = rf(userId, channelIds, timestamp)
+	if rf, ok := ret.Get(0).(func(string, []string) []string); ok {
+		r0 = rf(userId, channelIds)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]string)
@@ -29,8 +29,8 @@ func (_m *ThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds 
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, []string, int64) error); ok {
-		r1 = rf(userId, channelIds, timestamp)
+	if rf, ok := ret.Get(1).(func(string, []string) error); ok {
+		r1 = rf(userId, channelIds)
 	} else {
 		r1 = ret.Error(1)
 	}

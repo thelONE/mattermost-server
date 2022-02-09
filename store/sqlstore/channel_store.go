@@ -2434,10 +2434,9 @@ func (s SqlChannelStore) PermanentDeleteMembersByUser(userId string) error {
 // TODO: convert to squirrel (https://github.com/mattermost/mattermost-server/issues/19332)
 func (s SqlChannelStore) UpdateLastViewedAt(channelIds []string, userId string, updateThreads bool) (map[string]int64, error) {
 	var threadsToUpdate []string
-	now := model.GetMillis()
 	if updateThreads {
 		var err error
-		threadsToUpdate, err = s.Thread().CollectThreadsWithNewerReplies(userId, channelIds, now)
+		threadsToUpdate, err = s.Thread().CollectThreadsWithNewerReplies(userId, channelIds)
 		if err != nil {
 			return nil, err
 		}

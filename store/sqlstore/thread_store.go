@@ -643,7 +643,7 @@ func (s *SqlThreadStore) MaintainMembership(userId, postId string, opts store.Th
 	return membership, err
 }
 
-func (s *SqlThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds []string, timestamp int64) ([]string, error) {
+func (s *SqlThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds []string) ([]string, error) {
 	var changedThreads []string
 	query, args, _ := s.getQueryBuilder().
 		Select("Threads.PostId").
@@ -654,7 +654,6 @@ func (s *SqlThreadStore) CollectThreadsWithNewerReplies(userId string, channelId
 			sq.Eq{"ChannelMembers.UserId": userId},
 			sq.Or{
 				sq.Expr("Threads.LastReplyAt > ChannelMembers.LastViewedAt"),
-				sq.Gt{"Threads.LastReplyAt": timestamp},
 			},
 		}).
 		ToSql()

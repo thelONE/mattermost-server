@@ -10351,11 +10351,11 @@ func (s *RetryLayerTermsOfServiceStore) Save(termsOfService *model.TermsOfServic
 
 }
 
-func (s *RetryLayerThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds []string, timestamp int64) ([]string, error) {
+func (s *RetryLayerThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds []string) ([]string, error) {
 
 	tries := 0
 	for {
-		result, err := s.ThreadStore.CollectThreadsWithNewerReplies(userId, channelIds, timestamp)
+		result, err := s.ThreadStore.CollectThreadsWithNewerReplies(userId, channelIds)
 		if err == nil {
 			return result, nil
 		}

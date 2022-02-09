@@ -8167,10 +8167,10 @@ func (s *TimerLayerTermsOfServiceStore) Save(termsOfService *model.TermsOfServic
 	return result, err
 }
 
-func (s *TimerLayerThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds []string, timestamp int64) ([]string, error) {
+func (s *TimerLayerThreadStore) CollectThreadsWithNewerReplies(userId string, channelIds []string) ([]string, error) {
 	start := timemodule.Now()
 
-	result, err := s.ThreadStore.CollectThreadsWithNewerReplies(userId, channelIds, timestamp)
+	result, err := s.ThreadStore.CollectThreadsWithNewerReplies(userId, channelIds)
 
 	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
 	if s.Root.Metrics != nil {
