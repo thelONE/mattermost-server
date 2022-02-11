@@ -1,0 +1,1 @@
+/home/sumacheb/src/test/build-info/main.go
