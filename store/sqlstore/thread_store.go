@@ -475,10 +475,10 @@ func (s *SqlThreadStore) MarkAllAsReadByChannels(userID string, channelIDs []str
 		PlaceholderFormat(sq.Question).
 		Select("Threads.PostId").
 		From("Threads").
-		Join("ChannelMembers ON ChannelMembers.ChannelId = Threads.ChannelId").
+		Join("ThreadMemberships ON ThreadMemberships.PostId = Threads.PostId").
 		Where(sq.Eq{"Threads.ChannelId": channelIDs}).
-		Where(sq.Eq{"ChannelMembers.UserId": userID}).
-		Where(sq.Expr("Threads.LastReplyAt > ChannelMembers.LastViewedAt")).
+		Where(sq.Eq{"ThreadMemberships.UserId": userID}).
+		Where(sq.Expr("Threads.LastReplyAt > ThreadMemberships.LastViewed")).
 		ToSql()
 
 	query, args, _ := s.getQueryBuilder().
